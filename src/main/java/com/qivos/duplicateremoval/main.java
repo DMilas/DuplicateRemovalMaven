@@ -8,7 +8,7 @@ public class main {
 
     public static void main(String []args) {
         Map<String,Customer> customersList= DataHandler.importCustomers("Input Data.csv");
-        
+        DataHandler.exportData(customersList, "Output.csv");
     }
 
 
