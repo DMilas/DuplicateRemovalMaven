@@ -10,14 +10,22 @@ import java.util.Scanner;
 
 
 public class DataHandler {
-    private int duplicates=0;
+    private static int duplicates=0;
+    private static int countAttrChanged=0;
+    private static int linesProcessed=0;
+
+    public  DataHandler() {
+        
+    }
+    
+    
 
     public int getDuplicates() {
         return duplicates;
     }
 
-    public void setDuplicates(int duplicates) {
-        this.duplicates = duplicates;
+    public static void setDuplicates(int d) {
+        duplicates = d;
     }
 
     public static  String[] tokenize(String input){
@@ -30,7 +38,7 @@ public class DataHandler {
         Scanner filein=null;
         Map<String,Customer> temp=new HashMap<>();
        
-        int exactDuplicates=0;
+        
         try{
             filein= new Scanner(new File(filepath));}
         catch(FileNotFoundException e ){
@@ -38,22 +46,25 @@ public class DataHandler {
         }
         
 
-        //ToDo Create Unique Code
-        int line=1;
+        
+        linesProcessed++;
         while(filein.hasNext()){
             Customer tempCustomer=Customer.parseCustomer(filein.nextLine());
             if(tempCustomer!=null){
                 temp.putIfAbsent(tempCustomer.getMobileNumber(),tempCustomer);
                 //temp.add(tempCustomer);
                 if(temp.containsKey(tempCustomer.getMobileNumber())){
-                    temp.replace(tempCustomer.getMobileNumber(),tempCustomer);
-                    exactDuplicates++;
+                    if(temp.get(tempCustomer.getMobileNumber()).getEmail().equals(tempCustomer.getEmail()))setDuplicates(duplicates+1);
+                    
+                    else{
+                        temp.replace(tempCustomer.getMobileNumber(),tempCustomer);
+                        countAttrChanged++;
+                    }
                 }
-            }else System.err.println("Line :" +line);
-            line++;
-            //System.out.println(filein.nextLine());
+            }else System.err.println("Line :" +linesProcessed);
+            linesProcessed++;
+           
         }
-        System.out.println("No. of exact duplicates found : "+ exactDuplicates);
         return temp;
     }
 
@@ -67,6 +78,21 @@ public class DataHandler {
         }catch (IOException e){
             System.out.println(e);
         }
+        out.flush();
+        out.close();
+    }
+    
+    public static void printReport(String filename){
+        PrintWriter out=null;
+        try{
+            out=new PrintWriter(filename);
+            out.println("Number of duplicates found :\t"+duplicates+"\n"+
+                    "Number of attributes changed :\t"+countAttrChanged+"\n"+
+                    "Processed lines :\t"+linesProcessed);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        
         out.flush();
         out.close();
     }
