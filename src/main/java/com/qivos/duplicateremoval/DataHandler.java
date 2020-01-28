@@ -57,10 +57,15 @@ public class DataHandler {
         return temp;
     }
 
-    public static void exportData(ArrayList<Customer> customers,String filename) throws IOException {
-        PrintWriter out=new PrintWriter(filename);
-        for(Customer c: customers){
-            out.println(c.outString());
+    public static void exportData(Map<String,Customer> customers,String filename) {
+        PrintWriter out=null;
+        try{
+            out=new PrintWriter(filename);
+            for(Map.Entry<String,Customer> c: customers.entrySet()){
+                out.println(c.getValue().outString());
+            }
+        }catch (IOException e){
+            System.out.println(e);
         }
         out.flush();
         out.close();
